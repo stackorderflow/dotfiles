@@ -1,1 +1,9 @@
 .DS_Store
+
+# Local overrides with secrets — never commit these
+.zshenv.local
+.zshrc.local
+.zprofile.local
+
+# Backup dir created by install.sh
+.dotfiles_backup/
