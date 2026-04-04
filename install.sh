@@ -16,6 +16,12 @@ HOME_FILES=(
 # Files to symlink at $HOME/.config (relative to .config/)
 CONFIG_FILES=(
   btop/btop.conf
+  tmux/tmux.conf
+)
+
+# Whole directories to symlink at $HOME/.config (relative to .config/)
+CONFIG_DIRS=(
+  nvim
 )
 
 link() {
@@ -45,6 +51,12 @@ echo ""
 echo ".config files:"
 for f in "${CONFIG_FILES[@]}"; do
   link "$DOTFILES_DIR/.config/$f" "$HOME/.config/$f"
+done
+
+echo ""
+echo ".config dirs:"
+for d in "${CONFIG_DIRS[@]}"; do
+  link "$DOTFILES_DIR/.config/$d" "$HOME/.config/$d"
 done
 
 echo ""
