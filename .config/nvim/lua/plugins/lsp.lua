@@ -28,52 +28,46 @@ return {
       { "folke/neodev.nvim", opts = {} },  -- nvim API completions for lua_ls
     },
     config = function()
-      local lspconfig    = require("lspconfig")
-      local capabilities = require("cmp_nvim_lsp").default_capabilities()
+      -- Set capabilities globally for all servers
+      vim.lsp.config("*", {
+        capabilities = require("cmp_nvim_lsp").default_capabilities(),
+      })
 
-      -- Shared on_attach: keymaps that only make sense when an LSP is active
-      local on_attach = function(_, bufnr)
-        local map = function(lhs, rhs, desc)
-          vim.keymap.set("n", lhs, rhs, { buffer = bufnr, desc = desc })
-        end
+      -- Keymaps that only make sense when an LSP is active
+      vim.api.nvim_create_autocmd("LspAttach", {
+        callback = function(args)
+          local bufnr = args.buf
+          local map = function(lhs, rhs, desc)
+            vim.keymap.set("n", lhs, rhs, { buffer = bufnr, desc = desc })
+          end
 
-        map("gd",         vim.lsp.buf.definition,       "Go to definition")
-        map("gD",         vim.lsp.buf.declaration,      "Go to declaration")
-        map("gr",         vim.lsp.buf.references,       "References")
-        map("gI",         vim.lsp.buf.implementation,   "Go to implementation")
-        map("gy",         vim.lsp.buf.type_definition,  "Go to type definition")
-        map("K",          vim.lsp.buf.hover,            "Hover docs")
-        map("<C-s>",      vim.lsp.buf.signature_help,   "Signature help")
-        map("<leader>lr", vim.lsp.buf.rename,           "Rename symbol")
-        map("<leader>la", vim.lsp.buf.code_action,      "Code action")
-        map("<leader>lf", function() vim.lsp.buf.format({ async = true }) end, "Format")
-      end
+          map("gd",         vim.lsp.buf.definition,       "Go to definition")
+          map("gD",         vim.lsp.buf.declaration,      "Go to declaration")
+          map("gr",         vim.lsp.buf.references,       "References")
+          map("gI",         vim.lsp.buf.implementation,   "Go to implementation")
+          map("gy",         vim.lsp.buf.type_definition,  "Go to type definition")
+          map("K",          vim.lsp.buf.hover,            "Hover docs")
+          map("<C-s>",      vim.lsp.buf.signature_help,   "Signature help")
+          map("<leader>lr", vim.lsp.buf.rename,           "Rename symbol")
+          map("<leader>la", vim.lsp.buf.code_action,      "Code action")
+          map("<leader>lf", function() vim.lsp.buf.format({ async = true }) end, "Format")
+        end,
+      })
 
-      -- Per-server settings
-      local servers = {
-        lua_ls = {
-          settings = { Lua = {
-            diagnostics  = { globals = { "vim" } },
-            workspace    = { checkThirdParty = false },
-            telemetry    = { enable = false },
-          }},
-        },
-        pyright     = {},
-        ts_ls       = {},
-        gopls       = {},
-        rust_analyzer = {},
-        cssls       = {},
-        html        = {},
-        jsonls      = {},
-        bashls      = {},
-      }
+      -- Per-server settings (only servers that need overrides)
+      vim.lsp.config("lua_ls", {
+        settings = { Lua = {
+          diagnostics  = { globals = { "vim" } },
+          workspace    = { checkThirdParty = false },
+          telemetry    = { enable = false },
+        }},
+      })
 
-      for server, config in pairs(servers) do
-        lspconfig[server].setup(vim.tbl_deep_extend("force", {
-          on_attach    = on_attach,
-          capabilities = capabilities,
-        }, config))
-      end
+      -- Enable all servers (nvim-lspconfig provides their cmd/filetypes via runtimepath)
+      vim.lsp.enable({
+        "lua_ls", "ts_ls", "pyright", "gopls", "rust_analyzer",
+        "cssls", "html", "jsonls", "bashls",
+      })
 
       -- Diagnostic signs & style
       vim.diagnostic.config({

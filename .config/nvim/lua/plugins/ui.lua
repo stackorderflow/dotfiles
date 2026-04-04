@@ -22,12 +22,12 @@ return {
   -- ── Status line ────────────────────────────────────────────────────────────
   {
     "nvim-lualine/lualine.nvim",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
+    dependencies = { "nvim-tree/nvim-web-devicons", "catppuccin/nvim" },
     opts = {
       options = {
-        theme           = "catppuccin",
+        theme           = "catppuccin-mocha",
         globalstatus    = true,
-        component_separators = "|",
+        component_separators = { left = "|", right = "|" },
         section_separators  = { left = "", right = "" },
       },
     },
